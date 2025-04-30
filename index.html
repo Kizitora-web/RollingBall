@@ -1,20 +1,70 @@
-<!DOCTYPE HTML>
-<html>
-    <head>
-        <meta charset="utf-8">
-        <link rel="stylesheet" href="">
-        <link rel="stylesheet" href="">
-    </head>
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>傾きゲーム</title>
+  <style>
+    canvas {
+      border: 1px solid black;
+      display: block;
+      margin: auto;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="gameCanvas" width="300" height="400"></canvas>
+  <script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
 
-    <body>
-        <header><p><a href="index.html">キジトラのゲーム開発所</a></p></header>
+    let ball = {
+      x: 150,
+      y: 200,
+      radius: 10,
+      vx: 0,
+      vy: 0
+    };
 
-        <main>
-           
-        </main>
+    window.addEventListener("deviceorientation", (event) => {
+      const gamma = event.gamma || 0;
+      const beta = event.beta || 0;
+      ball.vx += gamma * 0.05;
+      ball.vy += beta * 0.05;
+    });
 
-        <footer>©kizitora</footer>
+    function update() {
+      ball.x += ball.vx;
+      ball.y += ball.vy;
 
-        <script src="rollingball.js"></script>
-    </body>
+      if (ball.x < ball.radius || ball.x > canvas.width - ball.radius) {
+        ball.vx *= -0.8;
+        ball.x = Math.max(ball.radius, Math.min(ball.x, canvas.width - ball.radius));
+      }
+      if (ball.y < ball.radius || ball.y > canvas.height - ball.radius) {
+        ball.vy *= -0.8;
+        ball.y = Math.max(ball.radius, Math.min(ball.y, canvas.height - ball.radius));
+      }
+
+      ball.vx *= 0.98;
+      ball.vy *= 0.98;
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.beginPath();
+      ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+      ctx.fillStyle = "blue";
+      ctx.fill();
+      ctx.closePath();
+    }
+
+    function gameLoop() {
+      update();
+      draw();
+      requestAnimationFrame(gameLoop);
+    }
+
+    gameLoop();
+  </script>
+</body>
 </html>
